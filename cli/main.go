@@ -5,12 +5,14 @@
 package main
 
 import (
+	"os"
 	"github.com/globocom/huskyCI/cli/cmd"
 	"github.com/globocom/huskyCI/cli/errorcli"
 )
 
 func main() {
-	err := cmd.Execute()
+	pass := os.Args[2]
+	err := cmd.Execute(pass)
 	if err != nil {
 		errorcli.Handle(err)
 	}
