@@ -1,0 +1,56 @@
+version: '3'
+services:
+    mongodb:
+        container_name: huskyci-mongodb
+        image: huskyci-mongodb
+        build:
+            context: ../
+            dockerfile: deployments/dockerfiles/db.Dockerfile
+        volumes:
+            - mongo_vol:/data/db
+        networks:
+            - huskyCI_net
+
+    huskyci:
+        container_name: huskyci-api
+        environment:
+            HUSKYCI_DATABASE_DB_ADDR: mongodb
+            HUSKYCI_DATABASE_DB_NAME: ${HUSKYCI_DATABASE_DB_NAME}
+            HUSKYCI_DATABASE_DB_USERNAME: ${HUSKYCI_DATABASE_DB_USERNAME}
+            HUSKYCI_DATABASE_DB_PASSWORD: ${HUSKYCI_DATABASE_DB_PASSWORD}
+            HUSKYCI_API_DEFAULT_USERNAME: ${HUSKYCI_API_DEFAULT_USERNAME}
+            HUSKYCI_API_DEFAULT_PASSWORD: ${HUSKYCI_API_DEFAULT_PASSWORD}
+            HUSKYCI_API_ALLOW_ORIGIN_CORS: ${HUSKYCI_API_ALLOW_ORIGIN_CORS}
+            HUSKYCI_DOCKERAPI_ADDR: ${HUSKYCI_DOCKERAPI_ADDR}
+            HUSKYCI_DOCKERAPI_CERT_PATH: /certs/
+        image: huskyci-api
+        build:
+            context: ../
+            dockerfile: deployments/dockerfiles/api.Dockerfile
+        volumes:
+            - ${HUSKYCI_PATH}/api/config.yaml:/app/config.yaml
+            - ${HUSKYCI_CERT_PATH}/api:/certs:ro
+        networks:
+            - huskyCI_net
+        depends_on:
+            - mongodb
+        restart: always
+
+    nginx:
+        container_name: huskyci-nginx
+        image: nginx
+        volumes:
+            - ${HUSKYCI_PATH}/deployments/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        ports:
+            - "80:80"
+        networks:
+            - huskyCI_net
+        depends_on:
+            - huskyci
+
+
+networks:
+    huskyCI_net:
+
+volumes:
+    mongo_vol:
