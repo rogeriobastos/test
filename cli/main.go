@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	pass := "password!"
 	err := cmd.Execute()
 	if err != nil {
 		errorcli.Handle(err)
