@@ -118,7 +118,6 @@ EOF
 docker run --rm --env-file client-env huskyci-client
 ```
 
-
 ## License
 
 huskyCI is licensed under the [BSD 3-Clause "New" or "Revised" License](https://github.com/globocom/huskyCI/blob/master/LICENSE.md).
